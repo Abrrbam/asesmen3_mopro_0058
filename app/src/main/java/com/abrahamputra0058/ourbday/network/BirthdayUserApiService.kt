@@ -30,4 +30,8 @@ object BirthdayUserApi {
     val service: BirthdayUserApiService by lazy {
         retrofit.create(BirthdayUserApiService::class.java)
     }
+
+    fun getBirthdayUserPicture(imageId: String): String {
+        return "$BASE_URL$imageId.jpg"
+    }
 }
