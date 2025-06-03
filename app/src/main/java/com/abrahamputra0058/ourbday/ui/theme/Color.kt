@@ -1,4 +1,4 @@
-package com.abrahamputra0058.ourbday
+package com.abrahamputra0058.ourbday.ui.theme
 import androidx.compose.ui.graphics.Color
 
 val primaryLight = Color(0xFF904B3B)
@@ -216,10 +216,3 @@ val surfaceContainerLowDarkHighContrast = Color(0xFF271D1B)
 val surfaceContainerDarkHighContrast = Color(0xFF392E2C)
 val surfaceContainerHighDarkHighContrast = Color(0xFF443936)
 val surfaceContainerHighestDarkHighContrast = Color(0xFF504441)
-
-
-
-
-
-
-
