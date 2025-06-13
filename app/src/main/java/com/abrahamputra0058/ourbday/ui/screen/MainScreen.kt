@@ -86,10 +86,12 @@ fun MainScreen() {
     val user by dataStore.userFlow.collectAsState(User())
 
     var showDialog by remember { mutableStateOf(false) }
+    var showBirthDialog by remember { mutableStateOf(false) }
 
     var bitmap: Bitmap? by remember { mutableStateOf(null) }
     val launcher = rememberLauncherForActivityResult(CropImageContract()) {
         bitmap = getCroppedImage(context.contentResolver, it)
+        if (bitmap != null) showBirthDialog = true
     }
 
 Scaffold(
@@ -150,6 +152,17 @@ Scaffold(
             CoroutineScope(Dispatchers.IO).launch { signOut(context, dataStore) }
             showDialog = false
         }
+
+    if (showBirthDialog) {
+        BirthProfileDialog(
+            bitmap = bitmap,
+            onDismissRequest = { showBirthDialog = false }) { nama, tanggalLahir ->
+            CoroutineScope(Dispatchers.IO).launch {
+                Log.d("TAMBAH", "Nama: $nama, Tanggal: $tanggalLahir ditambahkan.")
+                showBirthDialog = false
+            }
+        }
+    }
 }
 }
 
