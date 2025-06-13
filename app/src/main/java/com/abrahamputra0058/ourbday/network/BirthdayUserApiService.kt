@@ -7,7 +7,9 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.GET
 
-private val BASE_URL = "https://mpa0097dcdfc840f8471.free.beeceptor.com/"
+private val BASE_URL = "https://ourbday-api-production.up.railway.app/"
+
+//private val BASE_URL = "https://mpa0097dcdfc840f8471.free.beeceptor.com/"
 
 //GET - /birthday-user
 //https://mpa0097dcdfc840f8471.free.beeceptor.com/birthday-user.json
@@ -22,7 +24,7 @@ private val retrofit = Retrofit.Builder()
     .build()
 
 interface BirthdayUserApiService {
-    @GET("birthday-user.json")
+    @GET("birthday-users")
     suspend fun getBirthdayUser(): List<BirthdayUser>
 }
 
@@ -32,7 +34,7 @@ object BirthdayUserApi {
     }
 
     fun getBirthdayUserPicture(imageId: String): String {
-        return "$BASE_URL$imageId.jpg"
+        return "$BASE_URL/public/images/$imageId.jpg"
     }
 }
 

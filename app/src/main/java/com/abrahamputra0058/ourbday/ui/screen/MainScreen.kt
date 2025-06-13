@@ -28,6 +28,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -37,10 +40,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.credentials.ClearCredentialStateRequest
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetCredentialResponse
+import androidx.credentials.exceptions.ClearCredentialException
 import androidx.credentials.exceptions.GetCredentialException
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
@@ -48,8 +53,10 @@ import coil.request.ImageRequest
 import com.abrahamputra0058.ourbday.BuildConfig
 import com.abrahamputra0058.ourbday.R
 import com.abrahamputra0058.ourbday.model.BirthdayUser
+import com.abrahamputra0058.ourbday.model.User
 import com.abrahamputra0058.ourbday.network.ApiStatus
 import com.abrahamputra0058.ourbday.network.BirthdayUserApi
+import com.abrahamputra0058.ourbday.network.UserDataStore
 import com.abrahamputra0058.ourbday.ui.theme.OurBDayTheme
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
@@ -62,6 +69,10 @@ import kotlinx.coroutines.launch
 @Composable
 fun MainScreen() {
     val context = LocalContext.current
+    val dataStore = UserDataStore(context)
+    val user by dataStore.userFlow.collectAsState(User())
+
+    var showDialog by remember { mutableStateOf(false) }
 
 Scaffold(
     topBar ={
@@ -76,7 +87,13 @@ Scaffold(
             actions = {
 //                Profil Login
                 IconButton(
-                    onClick = {CoroutineScope(Dispatchers.IO).launch { signIn(context) }}
+                    onClick = {
+                        if(user.email.isEmpty()){
+                            CoroutineScope(Dispatchers.IO).launch { signIn(context, dataStore) }
+                        } else {
+                            showDialog = true
+                        }
+                    }
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.account_circle_24),
@@ -89,6 +106,14 @@ Scaffold(
     }
 ) { innerPadding ->
     ScreenContent(Modifier.padding(innerPadding))
+
+    if (showDialog)
+        ProfilDialog(
+            user = user,
+            onDismissRequest = { showDialog = false }) {
+            CoroutineScope(Dispatchers.IO).launch { signOut(context, dataStore) }
+            showDialog = false
+        }
 }
 }
 
@@ -189,7 +214,7 @@ fun ListBirthday(userBirth: BirthdayUser) {
 }
 
 
-private suspend fun signIn(context: Context) {
+private suspend fun signIn(context: Context, dataStore: UserDataStore) {
     val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
         .setFilterByAuthorizedAccounts(false)
         .setServerClientId(BuildConfig.API_KEY)
@@ -202,24 +227,42 @@ private suspend fun signIn(context: Context) {
     try {
         val credentialManager = CredentialManager.create(context)
         val result = credentialManager.getCredential(context, request)
-        handleSignIn(result)
+        handleSignIn(result, dataStore)
     } catch (e: GetCredentialException) {
         Log.e("SIGN-IN", "Error: ${e.errorMessage}")
     }
 }
 
-private fun handleSignIn(result: GetCredentialResponse) {
+private suspend fun handleSignIn(
+    result: GetCredentialResponse,
+    dataStore: UserDataStore
+) {
     val credential = result.credential
     if (credential is CustomCredential &&
         credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
         try {
             val googleId = GoogleIdTokenCredential.createFrom(credential.data)
-            Log.d("SIGN-IN", "User email: ${googleId.id}")
+            val nama = googleId.displayName ?: ""
+            val email = googleId.id
+            val photoUrl = googleId.profilePictureUri.toString()
+            dataStore.saveData(User(nama, email, photoUrl))
         } catch (e: GoogleIdTokenParsingException) {
             Log.e("SIGN-IN", "Error: ${e.message}")
         }
     } else {
         Log.e("SIGN-IN", "Error: unrecognized custom credential type")
+    }
+}
+
+private suspend fun signOut(context: Context, dataStore: UserDataStore) {
+    try{
+        val credentialManager = CredentialManager.create(context)
+        credentialManager.clearCredentialState(
+            ClearCredentialStateRequest()
+        )
+        dataStore.saveData(User())
+    } catch (e: ClearCredentialException) {
+        Log.e("SIGN-IN", "Error: ${e.errorMessage}")
     }
 }
 

@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "958988812839",
+    "project_id": "ases3-ourbday",
+    "storage_bucket": "ases3-ourbday.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:958988812839:android:2e643785ac7ea2f21f0402",
+        "android_client_info": {
+          "package_name": "com.abrahamputra0058.ourbday"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "958988812839-74n3cer0vomeglfrcrt31ch0oarctpvj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.abrahamputra0058.ourbday",
+            "certificate_hash": "62a442783dc079b7bb4470b4fcd1bf3dd8203a3c"
+          }
+        },
+        {
+          "client_id": "958988812839-b7p5jf0prrn1mp2nterct3rdpkvjgjs4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAhthsBYS6rKQ0Eoa6xvO-sek2-81gUs-c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "958988812839-b7p5jf0prrn1mp2nterct3rdpkvjgjs4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
