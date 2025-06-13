@@ -1,11 +1,18 @@
 package com.abrahamputra0058.ourbday.network
 
 import com.abrahamputra0058.ourbday.model.BirthdayUser
+import com.abrahamputra0058.ourbday.model.OpStatus
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.GET
+import retrofit2.http.Header
+import retrofit2.http.Multipart
+import retrofit2.http.POST
+import retrofit2.http.Part
 
 private val BASE_URL = "https://ourbday-api-production.up.railway.app/"
 
@@ -26,6 +33,15 @@ private val retrofit = Retrofit.Builder()
 interface BirthdayUserApiService {
     @GET("birthday-users")
     suspend fun getBirthdayUser(): List<BirthdayUser>
+
+    @Multipart
+    @POST("birthday-user")
+    suspend fun postBirthdayUser(
+        @Header("Authorization") userId: String,
+        @Part("nama") nama: RequestBody,
+        @Part("tanggalLahir") tanggalLahir: RequestBody,
+        @Part image: MultipartBody.Part
+    ): OpStatus
 }
 
 object BirthdayUserApi {
