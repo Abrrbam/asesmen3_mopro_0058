@@ -6,7 +6,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.abrahamputra0058.ourbday.model.BirthdayUser
-import com.abrahamputra0058.ourbday.model.User
 import com.abrahamputra0058.ourbday.network.ApiStatus
 import com.abrahamputra0058.ourbday.network.BirthdayUserApi
 import kotlinx.coroutines.Dispatchers
@@ -15,7 +14,6 @@ import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 
 class MainViewModel : ViewModel() {
@@ -55,6 +53,22 @@ class MainViewModel : ViewModel() {
                     retrieveBirthdayUser(userId)
                 else
                     throw Exception(result.message)
+            } catch (e: Exception) {
+                Log.d("MainViewModel", "Failure: ${e.message}")
+                errorMessage.value = "Error: ${e.message}"
+            }
+        }
+    }
+
+    fun deleteBirthdayUser(userId: String, imageId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val result = BirthdayUserApi.service.deleteBirthProfile(
+                    userId,
+                    imageId
+                )
+                if (result.status == "success")
+                    retrieveBirthdayUser(userId)
             } catch (e: Exception) {
                 Log.d("MainViewModel", "Failure: ${e.message}")
                 errorMessage.value = "Error: ${e.message}"

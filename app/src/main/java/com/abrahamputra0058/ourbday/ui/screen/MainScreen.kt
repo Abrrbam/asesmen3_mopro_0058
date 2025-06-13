@@ -92,6 +92,7 @@ fun MainScreen() {
 
     var showDialog by remember { mutableStateOf(false) }
     var showBirthDialog by remember { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     var bitmap: Bitmap? by remember { mutableStateOf(null) }
     val launcher = rememberLauncherForActivityResult(CropImageContract()) {
@@ -169,6 +170,18 @@ Scaffold(
         }
     }
 
+    if (showDeleteDialog) {
+        DeleteDialog(
+            bitmap = bitmap,
+            birthday = BirthdayUser("", "", "", ""),
+            onDismissRequest = { showDeleteDialog = false },
+            onConfirmation = { birthdayId ->
+                viewModel.deleteBirthdayUser(user.email, birthdayId)
+                showDeleteDialog = false
+            }
+        )
+    }
+
     if (errorMessage != null) {
         Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
         viewModel.clearMessage()
@@ -221,7 +234,7 @@ fun ScreenContent(viewModel: MainViewModel, userId: String, modifier: Modifier =
                 contentPadding = PaddingValues(bottom = 80.dp)
             ) {
                 items(data) {
-                    ListBirthday(userBirth = it)
+                    ListBirthday(userBirth = it, userId)
                 }
             }
         }
@@ -231,7 +244,7 @@ fun ScreenContent(viewModel: MainViewModel, userId: String, modifier: Modifier =
 }
 
 @Composable
-fun ListBirthday(userBirth: BirthdayUser) {
+fun ListBirthday(userBirth: BirthdayUser, userId: String) {
     Box(
         modifier = Modifier
             .padding(4.dp)
