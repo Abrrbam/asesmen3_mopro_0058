@@ -29,15 +29,11 @@ class MainViewModel : ViewModel() {
     var errorMessage = mutableStateOf<String?>(null)
         private set
 
-    init {
-        retrieveBirthdayUser()
-    }
-
-    fun retrieveBirthdayUser() {
+    fun retrieveBirthdayUser(userId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             status.value = ApiStatus.LOADING
             try {
-                data.value = BirthdayUserApi.service.getBirthdayUser()
+                data.value = BirthdayUserApi.service.getBirthdayUser(userId)
                 status.value = ApiStatus.SUCCESS
             } catch (e: Exception) {
                 status.value = ApiStatus.FAILED
@@ -56,7 +52,7 @@ class MainViewModel : ViewModel() {
                 )
 
                 if (result.status == "success")
-                    retrieveBirthdayUser()
+                    retrieveBirthdayUser(userId)
                 else
                     throw Exception(result.message)
             } catch (e: Exception) {

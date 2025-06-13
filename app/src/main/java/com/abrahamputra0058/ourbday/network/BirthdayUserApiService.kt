@@ -32,7 +32,9 @@ private val retrofit = Retrofit.Builder()
 
 interface BirthdayUserApiService {
     @GET("birthday-users")
-    suspend fun getBirthdayUser(): List<BirthdayUser>
+    suspend fun getBirthdayUser(
+        @Header("Authorization") userId: String
+    ): List<BirthdayUser>
 
     @Multipart
     @POST("birthday-user")
